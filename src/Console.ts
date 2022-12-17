@@ -35,6 +35,10 @@ export class Match {
         return -1;            
     }
 
+    getGame() {
+        return this.game;
+    }
+
     toString() {
         console.log( `${this.game[0].team.name} ${this.game[0].score} vs ${this.game[1].score} ${this.game[1].team.name}` );        
     }
@@ -49,15 +53,17 @@ export class TeamStats {
 }
 
 export class Tournament {
-    private teams: Team[];
-    private table: TeamStats[];
-    private fixtures: Match[];
+    private teams: Team[] = [];
+    private table: TeamStats[] = [];
+    private fixtures: Match[] = [];
 
     constructor() {}
 
     public addTeam(teamName: string) {
         let team: Team = new Team(teamName);
         this.teams.push(team);
+        console.log(this.teams);
+        
         let teamStats = new TeamStats(team, 0);
         this.table.push(teamStats);
     }
@@ -70,8 +76,10 @@ export class Tournament {
      */
     public getTeam(teamName :string) : Team {
         try {
-            let teamFound = new Team('temp');
-            teamFound = this.teams.find(t => t.name = teamName);
+            //let teamFound = new Team('temp');
+            let teamFound = this.teams.find(t => t.name === teamName);
+            // console.log(`team found ${teamFound.name}`);
+            
             if (teamFound === undefined) {
                 throw new TypeError('The value was promised to always be there!');
               }
@@ -85,12 +93,14 @@ export class Tournament {
     public addMatch(team1: Team, team2: Team) {
         let sideMatch1: SideMatch = new SideMatch(team1, 0);
         let sideMatch2: SideMatch = new SideMatch(team2, 0);
-
+        console.log(`add match - sm1 ${sideMatch1.team.name}` );
+        console.log(`add match - sm2 ${sideMatch2.team.name}` );
         var game1: SideMatch[] = [];
 
         game1.push(sideMatch1);
         game1.push(sideMatch2);
-
+        console.log(game1);
+        
         let match1 = new Match( game1 );
 
         this.fixtures.push(match1);
@@ -104,9 +114,11 @@ export class Tournament {
 
     private calculateMatchPoints(matchIndex: number) {
         let results : number = this.fixtures[matchIndex].winner();
+        console.log(results);
+        
         if (results !== -1)
         {
-            console.log(this.fixtures[matchIndex][results]);             
+            console.log(this.fixtures[matchIndex].getGame());             
         }       
         
     }
@@ -159,8 +171,15 @@ let worldCup2022: Tournament = new Tournament();
 
 worldCup2022.addTeam('Brazil');
 worldCup2022.addTeam('Canada');
+console.log('t1 name with getTeam ' + worldCup2022.getTeam('Canada').name); // shows correctly t1 name Canada
+console.log('t2 name with getTeam ' + worldCup2022.getTeam('Brazil').name); // shows correctly t2 name Brazil
+const team1 = worldCup2022.getTeam('Canada');  
+const team2 = worldCup2022.getTeam('Brazil');
+console.log('t1 name ' + team1.name); // shows incorrectly t1 name as Brazil (last one got)
+console.log('t2 name ' + team2.name); // shows incorrectly t1 name as Brazil (last one got)
 
-worldCup2022.addMatch(worldCup2022.getTeam('Brazil'),worldCup2022.getTeam('Canada'));
+
+worldCup2022.addMatch(team1,team2);
 
 worldCup2022.addMatchResults(0, 2, 0);
 
